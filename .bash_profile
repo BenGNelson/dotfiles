@@ -39,29 +39,20 @@ bakcyn='\e[46m'   # Cyan
 bakwht='\e[47m'   # White
  
 txtrst='\e[0m'    # Text Reset
- 
-print_before_the_prompt () {
-    printf "\n$bldgrn%s $bldpur%s\n$txtrst" "$PWD" "$(vcprompt)"
-}
- 
-PROMPT_COMMAND=print_before_the_prompt
-PS1='-> '
 
-# added by Anaconda3 5.1.0 installer
-export PATH="/anaconda3/bin:$PATH"
-# added by Anaconda3 2019.10 installer
-# >>> conda init >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$(CONDA_REPORT_ERRORS=false '/Users/benjamin/opt/anaconda3/bin/conda' shell.bash hook 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    \eval "$__conda_setup"
-else
-    if [ -f "/Users/benjamin/opt/anaconda3/etc/profile.d/conda.sh" ]; then
-        . "/Users/benjamin/opt/anaconda3/etc/profile.d/conda.sh"
-        CONDA_CHANGEPS1=false conda activate base
-    else
-        \export PATH="/Users/benjamin/opt/anaconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda init <<<
+print_before_the_prompt () {
+	printf "\n$bldgrn%s $bldpur%s\n$txtrst" "$PWD"
+}
+
+PROMPT_COMMAND=print_before_the_prompt
+export PS1="-> "
+
+alias saturn="ssh bgnelson99@saturn"
+alias saturnlab="ssh bgnelson99@saturnlab"
+alias titan="ssh bgnelson99@titan"
+alias titanlab="ssh bgnelson99@titanlab"
+alias ls="ls -l -G"
+alias dl="cd ~/Downloads"
+alias dk="cd ~/Desktop"
+alias docs="cd ~/Documents"
+alias ..="cd .."
