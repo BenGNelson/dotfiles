@@ -1,13 +1,11 @@
 # dotfiles
-This repo contains my personal dotfiles.
+This repo contains my personal dotfiles. Clone the repo to your home directory and run these commands there to point your dotfiles to the repo. It may be a good idea to make backups beforehand.
 
-## Clone the repo to your home directory and run these commands there to point your dotfiles to the repo. It may be a good idea to make backups beforehand.
-
-###vimrc
+### vimrc
 `echo "source ~/dotfiles/vimrc`
 
-###bash_profile
+### bash_profile
 `echo "source ~/dotfiles/bash_profile`
 
-###bashrc
+### bashrc
 `echo "source ~/dotfiles/bashrc`
