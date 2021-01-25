@@ -1,3 +1,5 @@
+#Colors
+
 # Normal Coloring
 txtblk='\e[0;30m' # Black - Regular
 txtred='\e[0;31m' # Red
@@ -37,8 +39,9 @@ bakblu='\e[44m'   # Blue
 bakpur='\e[45m'   # Purple
 bakcyn='\e[46m'   # Cyan
 bakwht='\e[47m'   # White
- 
 txtrst='\e[0m'    # Text Reset
+
+#Prompt
 
 print_before_the_prompt () {
 	printf "\n$bldgrn%s $bldpur%s\n$txtrst" "$PWD"
@@ -47,13 +50,25 @@ print_before_the_prompt () {
 PROMPT_COMMAND=print_before_the_prompt
 export PS1="-> "
 
+#Aliases
+
+#ssh
 alias saturn="ssh bgnelson99@saturn"
 alias saturnlab="ssh bgnelson99@saturnlab"
 alias titan="ssh bgnelson99@titan"
 alias titanlab="ssh bgnelson99@titanlab"
+
+#color
 alias ls="ls -l -G"
+alias grep='grep --color'
+
+#cd shortcuts
 alias dl="cd ~/Downloads"
 alias dk="cd ~/Desktop"
 alias docs="cd ~/Documents"
 alias ..="cd .."
 alias home="cd ~"
+
+#ls
+alias lrth="ls -lrth"
+alias lrtha="ls -lrtha"
