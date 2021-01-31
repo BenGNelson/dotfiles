@@ -9,3 +9,6 @@ This repo contains my personal dotfiles. Clone the repo to your home directory a
 
 ### bashrc
 `echo "source ~/dotfiles/bashrc" > ~/.bashrc`
+
+### zshrc
+`echo "source ~/dotfiles/zshrc" > ~/.zshrc`
