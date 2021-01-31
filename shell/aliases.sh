@@ -12,3 +12,6 @@ alias home="cd ~"
 # ls
 alias lrth="ls -lrth"
 alias lrtha="ls -lrtha"
+
+# git 
+alias gs="git status"
