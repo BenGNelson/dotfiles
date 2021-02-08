@@ -3,6 +3,9 @@ alias saturn="ssh bgnelson99@saturn"
 alias saturnlab="ssh bgnelson99@saturnlab"
 alias titan="ssh bgnelson99@titan"
 alias titanlab="ssh bgnelson99@titanlab"
+alias pan="ssh bgnelson@pan"
+alias pan2="ssh bgnelson@pan2"
+alias tac7="ssh bgnelson@tac7"
 
 # color
 alias ls="ls -l -G"
