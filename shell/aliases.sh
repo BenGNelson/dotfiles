@@ -6,11 +6,8 @@ alias titanlab="ssh bgnelson99@titanlab"
 alias pan="ssh bgnelson@pan"
 alias pan2="ssh bgnelson@pan2"
 alias tac7="ssh bgnelson@tac7"
-<<<<<<< HEAD
 alias ice="ssh bgnelson99@ice"
-=======
 alias bespin="ssh ben@157.230.62.125"
->>>>>>> 153da6ef6f44defbcb0bcb5ea01112e896193626
 
 # color
 alias ls="ls -l -G"
