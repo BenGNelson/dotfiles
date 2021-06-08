@@ -11,7 +11,7 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 
 " Actual plugins
-Plugin 'ycm-core/YouCompleteMe'
+" removing because I can't use it on this version of MacOs Plugin 'ycm-core/YouCompleteMe'
 Plugin 'vim-syntastic/syntastic'
 
 " The following are examples of different formats supported.
