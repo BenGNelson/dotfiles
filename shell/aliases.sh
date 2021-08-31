@@ -8,7 +8,7 @@ alias pan2="ssh bgnelson@pan2"
 alias tac7="ssh bgnelson@tac7"
 alias ice="ssh bgnelson99@ice"
 alias bespin="ssh ben@157.230.62.125"
-alias fire ="ssh bgnelson99@bgnelson99@10.0.10.14@10.0.32.30"
+alias fire="ssh bgnelson99@bgnelson99@10.0.10.14@10.0.32.30"
 
 # color
 alias ls="ls -l -G"
