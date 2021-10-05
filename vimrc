@@ -7,15 +7,7 @@ call vundle#begin()
 " alternatively, pass a path where Vundle should install plugins
 "call vundle#begin('~/some/path/here')
 
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
 
-" Actual plugins
-<<<<<<< HEAD
-" removing because I can't use it on this version of MacOs Plugin 'ycm-core/YouCompleteMe'
-=======
->>>>>>> 153da6ef6f44defbcb0bcb5ea01112e896193626
-Plugin 'vim-syntastic/syntastic'
 
 " The following are examples of different formats supported.
 " Keep Plugin commands between vundle#begin/end.
