@@ -39,9 +39,9 @@ print_before_the_prompt() {
     git_status=$(_git_info)
     if [[ -n "$git_status" ]]; then
         if [[ "$git_status" == *"*"* ]] || [[ "$git_status" == *"↓"* ]]; then
-            git_part=" \e[1;31m($git_status)\e[0m"
+            git_part=$(printf " \e[1;31m(%s)\e[0m" "$git_status")
         else
-            git_part=" \e[1;33m($git_status)\e[0m"
+            git_part=$(printf " \e[1;33m(%s)\e[0m" "$git_status")
         fi
     fi
     printf "\n\e[1;36m%s\e[0m%s\n" "$PWD" "$git_part"
