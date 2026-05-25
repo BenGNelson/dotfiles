@@ -20,3 +20,6 @@ alias home="cd ~"
 
 # git
 alias gs="git status"
+
+# reload shell config
+alias reload="source ~/dotfiles/bash_profile"
