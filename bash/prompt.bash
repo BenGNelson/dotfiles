@@ -46,4 +46,4 @@ print_before_the_prompt () {
 }
 
 PROMPT_COMMAND=print_before_the_prompt
-export PS1="skywalker-> "
+export PS1="r2d2-> "
