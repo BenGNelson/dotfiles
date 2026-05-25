@@ -1,49 +1,52 @@
-# Colors
-# Normal Coloring
-txtblk='\e[0;30m' # Black - Regular
-txtred='\e[0;31m' # Red
-txtgrn='\e[0;32m' # Green
-txtylw='\e[0;33m' # Yellow
-txtblu='\e[0;34m' # Blue
-txtpur='\e[0;35m' # Purple
-txtcyn='\e[0;36m' # Cyan
-txtwht='\e[0;37m' # White
+# Colors (for use in printf/PROMPT_COMMAND context)
+txtblk='\e[0;30m'
+txtred='\e[0;31m'
+txtgrn='\e[0;32m'
+txtylw='\e[0;33m'
+txtblu='\e[0;34m'
+txtpur='\e[0;35m'
+txtcyn='\e[0;36m'
+txtwht='\e[0;37m'
+bldblk='\e[1;30m'
+bldred='\e[1;31m'
+bldgrn='\e[1;32m'
+bldylw='\e[1;33m'
+bldblu='\e[1;34m'
+bldpur='\e[1;35m'
+bldcyn='\e[1;36m'
+bldwht='\e[1;37m'
+txtrst='\e[0m'
 
-# Bold Coloring
-bldblk='\e[1;30m' # Black - Bold
-bldred='\e[1;31m' # Red
-bldgrn='\e[1;32m' # Green
-bldylw='\e[1;33m' # Yellow
-bldblu='\e[1;34m' # Blue
-bldpur='\e[1;35m' # Purple
-bldcyn='\e[1;36m' # Cyan
-bldwht='\e[1;37m' # White
- 
-# Underlined
-unkblk='\e[4;30m' # Black - Underline
-undred='\e[4;31m' # Red
-undgrn='\e[4;32m' # Green
-undylw='\e[4;33m' # Yellow
-undblu='\e[4;34m' # Blue
-undpur='\e[4;35m' # Purple
-undcyn='\e[4;36m' # Cyan
-undwht='\e[4;37m' # White
- 
-#Background Coloring
-bakblk='\e[40m'   # Black - Background
-bakred='\e[41m'   # Red
-bakgrn='\e[42m'   # Green
-bakylw='\e[43m'   # Yellow
-bakblu='\e[44m'   # Blue
-bakpur='\e[45m'   # Purple
-bakcyn='\e[46m'   # Cyan
-bakwht='\e[47m'   # White
-txtrst='\e[0m'    # Text Reset
+# Returns: "branch[*] [↑N] [↓N]" when inside a git repo, empty otherwise
+_git_info() {
+    local branch dirty info upstream behind ahead
+    branch=$(git symbolic-ref --short HEAD 2>/dev/null) || return
+    if ! git diff --quiet --ignore-submodules 2>/dev/null || \
+       ! git diff --cached --quiet --ignore-submodules 2>/dev/null; then
+        dirty="*"
+    fi
+    upstream=$(git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null)
+    if [[ -n "$upstream" ]]; then
+        read -r behind ahead < <(git rev-list --count --left-right "$upstream"...HEAD 2>/dev/null)
+        [[ "${ahead:-0}" -gt 0 ]] && info+=" ↑$ahead"
+        [[ "${behind:-0}" -gt 0 ]] && info+=" ↓$behind"
+    fi
+    printf '%s' "${branch}${dirty}${info}"
+}
 
-# Prompt
-print_before_the_prompt () {
-	printf "\n$bldgrn%s $bldpur%s\n$txtrst" "$PWD"
+print_before_the_prompt() {
+    local git_status git_part=""
+    git_status=$(_git_info)
+    if [[ -n "$git_status" ]]; then
+        if [[ "$git_status" == *"*"* ]] || [[ "$git_status" == *"↓"* ]]; then
+            git_part=" \e[1;31m($git_status)\e[0m"
+        else
+            git_part=" \e[1;33m($git_status)\e[0m"
+        fi
+    fi
+    printf "\n\e[1;36m%s\e[0m%s\n" "$PWD" "$git_part"
 }
 
 PROMPT_COMMAND=print_before_the_prompt
-export PS1="r2d2-> "
+# \h = short hostname (dynamic — set with: sudo hostnamectl set-hostname <name>)
+PS1='\[\033[1;32m\]\h\[\033[0m\]-> '
