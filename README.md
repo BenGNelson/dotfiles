@@ -10,7 +10,7 @@ bash/    bashrc, bash_profile, prompt.bash   (interactive bash + two-line prompt
 zsh/     zshrc, prompt.zsh                    (zsh, prompt matched to bash)
 shell/   aliases.sh                           (aliases shared by bash + zsh)
 vim/     vimrc                                (sensible defaults, no plugins)
-tmux/    tmux.conf                            (C-a prefix, | and - splits)
+tmux/    tmux.conf                            (C-a prefix, mouse, status bar)
 macos/   hammerspoon/, *.terminal             (reference assets, not auto-installed)
 install.sh    bootstrap.sh
 ```
@@ -75,6 +75,23 @@ Pull the latest and re-run the installer in one step:
 ```sh
 dot-update
 ```
+
+## tmux
+
+Prefix is `C-a` (not the default `C-b`). Mouse is on (click panes, drag borders,
+scroll history), with a status bar showing session, windows, host, and clock.
+
+The only commands you actually need:
+
+```sh
+tmux new -s work     # start a named session 'work'
+#   C-a d            # detach — leave it running, return to your normal shell
+tmux attach -t work  # reattach later (survives SSH drops / closing the laptop)
+tmux ls              # list running sessions
+```
+
+Inside a session: `C-a |` and `C-a -` split panes, `C-a h/j/k/l` move between
+them, `C-a r` reloads the config.
 
 ## Aliases
 
