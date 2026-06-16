@@ -1,0 +1,9 @@
+# Per-machine overrides (DOTFILES_LABEL, extra exports, etc.) — sourced FIRST so
+# the prompt can pick up DOTFILES_LABEL. This file is untracked; see install.sh.
+[ -f ~/.config/dotfiles/local.sh ] && source ~/.config/dotfiles/local.sh
+
+# Prompt
+source ~/dotfiles/zsh/prompt.zsh
+
+# Aliases
+source ~/dotfiles/shell/aliases.sh

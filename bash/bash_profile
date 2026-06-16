@@ -1,0 +1,2 @@
+# Login shells: load the interactive bash config.
+[ -f ~/dotfiles/bash/bashrc ] && source ~/dotfiles/bash/bashrc

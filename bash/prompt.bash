@@ -48,5 +48,9 @@ print_before_the_prompt() {
 }
 
 PROMPT_COMMAND=print_before_the_prompt
-# \h = short hostname (dynamic — set with: sudo hostnamectl set-hostname <name>)
-PS1='\[\033[1;32m\]\h\[\033[0m\]-> '
+
+# Machine label shown on the bottom line. Defaults to the live short hostname so
+# it's always correct on a fresh machine with zero edits. Override per-machine by
+# setting DOTFILES_LABEL in ~/.config/dotfiles/local.sh (sourced before this file).
+_dot_label="${DOTFILES_LABEL:-$(hostname -s 2>/dev/null || echo "${HOSTNAME%%.*}")}"
+PS1='\[\033[1;32m\]'"${_dot_label}"'\[\033[0m\] -> '
