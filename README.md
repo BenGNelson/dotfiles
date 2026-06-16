@@ -17,6 +17,9 @@ install.sh    bootstrap.sh
 
 ## Install
 
+**Requirements:** `git` (for the bootstrap clone and `dot-update`). The shell/tool
+configs apply only to what you have installed — bash, and optionally zsh, vim, tmux.
+
 On a machine that already has the repo cloned to `~/dotfiles`:
 
 ```sh
