@@ -16,22 +16,24 @@
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BEGIN="# >>> dotfiles >>>"
-END="# <<< dotfiles <<<"
 
-# ensure_block <target_file> <source_path>
-# Idempotently install/update the managed block in <target_file>.
+# ensure_block <target_file> <source_path> [comment_char]
+# Idempotently install/update the managed block in <target_file>. The comment
+# char defaults to '#' (bash/zsh/tmux); Vim needs '"' or it errors on the
+# marker lines (E488).
 ensure_block() {
-    local target="$1" src="$2"
+    local target="$1" src="$2" c="${3:-#}"
+    local begin="$c >>> dotfiles >>>"
+    local end="$c <<< dotfiles <<<"
     local block
-    block=$(printf '%s\n# managed by ~/dotfiles/install.sh — edit the repo, not this block\nsource %s\n%s' \
-        "$BEGIN" "$src" "$END")
+    block=$(printf '%s\n%s managed by ~/dotfiles/install.sh — edit the repo, not this block\nsource %s\n%s' \
+        "$begin" "$c" "$src" "$end")
 
-    if [ -f "$target" ] && grep -qF "$BEGIN" "$target"; then
+    if [ -f "$target" ] && grep -qF "$begin" "$target"; then
         # Block exists — replace everything between the markers (inclusive).
         local tmp
         tmp=$(mktemp)
-        awk -v b="$BEGIN" -v e="$END" -v repl="$block" '
+        awk -v b="$begin" -v e="$end" -v repl="$block" '
             $0==b {print repl; skip=1; next}
             $0==e {skip=0; next}
             !skip {print}
@@ -55,7 +57,7 @@ echo "Installing dotfiles from $REPO ..."
 ensure_block "$HOME/.bashrc"       "$REPO/bash/bashrc"
 ensure_block "$HOME/.bash_profile" "$REPO/bash/bash_profile"
 ensure_block "$HOME/.zshrc"        "$REPO/zsh/zshrc"
-ensure_block "$HOME/.vimrc"        "$REPO/vim/vimrc"
+ensure_block "$HOME/.vimrc"        "$REPO/vim/vimrc"        '"'
 ensure_block "$HOME/.tmux.conf"    "$REPO/tmux/tmux.conf"
 
 # Seed the untracked per-machine override file (never overwrite an existing one).
