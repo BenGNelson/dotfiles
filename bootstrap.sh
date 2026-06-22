@@ -14,8 +14,10 @@
 
 set -euo pipefail
 
-REPO_URL="https://github.com/BenGNelson/dotfiles.git"
-DEST="$HOME/dotfiles"
+# REPO_URL/DEST are overridable from the environment so the test suite can point
+# this script at a local clone and run it hermetically (no network / no GitHub).
+REPO_URL="${REPO_URL:-https://github.com/BenGNelson/dotfiles.git}"
+DEST="${DEST:-$HOME/dotfiles}"
 WITH_TOOLS=""
 [ "${1:-}" = "--with-tools" ] && WITH_TOOLS=1
 

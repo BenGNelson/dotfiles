@@ -5,7 +5,9 @@
 # would, and asserts the result is correct, idempotent (install runs twice), and
 # reversible (--uninstall). The dependency install inside each container goes
 # through lib/install-tools.sh, so this also exercises the cross-distro
-# (apt/dnf/pacman/zypper) tool installer. Requires Docker; nothing is installed
+# (apt/dnf/pacman/zypper) tool installer. A second pass per image then drives the
+# real curl-pipe entry point, bootstrap.sh --with-tools, end to end (inline git
+# probe -> clone -> tools -> install.sh). Requires Docker; nothing is installed
 # on the host.
 #
 #   ./test.sh                       # run the full distro matrix
@@ -130,19 +132,69 @@ pass "uninstall removed all managed blocks and the git include"
 echo "ALL CHECKS PASSED"
 CONTAINER
 
+# A second, fresh-container pass that drives the real entry point — bootstrap.sh
+# --with-tools — end to end. On a clean image with no ~/dotfiles (and, on most
+# base images, no git) this exercises the one path the install test above skips:
+# bootstrap's own inline git probe, the clone, the install-tools call, and the
+# hand-off to install.sh — i.e. exactly what a curl-piped new machine runs.
+read -r -d '' BOOTSTRAP_SCRIPT <<'BOOTSTRAP' || true
+set -euo pipefail
+
+fail() { echo "  ✗ $1"; exit 1; }
+pass() { echo "  ✓ $1"; }
+
+# Point bootstrap at the mounted repo so it clones locally — hermetic, no
+# network. safe.directory '*' avoids git's dubious-ownership refusal when the
+# mount is owned by a different uid than the (root) container user. Writing the
+# file works even before git is installed (bootstrap's probe installs it).
+printf '[safe]\n\tdirectory = *\n' > ~/.gitconfig
+
+if command -v git > /dev/null 2>&1; then
+    echo "  (git already on this image — bootstrap's inline git probe is skipped)"
+else
+    echo "  (no git — bootstrap's inline git install runs first)"
+fi
+
+REPO_URL=/repo bash /repo/bootstrap.sh --with-tools
+
+for t in git vim tmux; do
+    command -v "$t" > /dev/null 2>&1 || fail "$t not installed by bootstrap --with-tools"
+done
+pass "bootstrap --with-tools installed the tool set (git, vim, tmux)"
+
+[ -d ~/dotfiles/.git ] || fail "bootstrap did not clone the repo to ~/dotfiles"
+pass "repo cloned to ~/dotfiles"
+
+grep -qF ">>> dotfiles >>>" ~/.bashrc 2>/dev/null \
+    || fail "bootstrap did not run install.sh (no managed block in ~/.bashrc)"
+pass "bootstrap ran install.sh (managed block present)"
+
+echo "BOOTSTRAP OK"
+BOOTSTRAP
+
 # ── Run the matrix ───────────────────────────────────────────────────────────
 declare -a RESULTS
 overall=0
+
+# Pipe a script into a throwaway container for one image.
+run_in() {  # run_in <image> <script>
+    printf '%s' "$2" | docker run --rm -i \
+        -v "$REPO":/repo:ro \
+        -e DEBIAN_FRONTEND=noninteractive \
+        "$1" bash
+}
 
 for image in "${IMAGES[@]}"; do
     echo ""
     echo "════════════════════════════════════════════════════════════════"
     echo "  $image"
     echo "════════════════════════════════════════════════════════════════"
-    if printf '%s' "$CONTAINER_SCRIPT" | docker run --rm -i \
-        -v "$REPO":/repo:ro \
-        -e DEBIAN_FRONTEND=noninteractive \
-        "$image" bash; then
+    ok=1
+    echo "── install + assertions ────────────────────────────────────────"
+    run_in "$image" "$CONTAINER_SCRIPT" || ok=0
+    echo "── bootstrap --with-tools (end-to-end) ─────────────────────────"
+    run_in "$image" "$BOOTSTRAP_SCRIPT" || ok=0
+    if [ "$ok" -eq 1 ]; then
         RESULTS+=("PASS  $image")
     else
         RESULTS+=("FAIL  $image")
