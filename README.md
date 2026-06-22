@@ -73,12 +73,13 @@ doesn't have to live at `~/dotfiles`.
 
 ## The prompt
 
-Two lines: the working directory (and git status) on top, the machine name and an
-arrow on the bottom:
+Two lines: the working directory (and git status) on top, the machine's hostname
+and an arrow on the bottom (`mybox` below stands in for whatever the machine is
+actually called):
 
 ```
-/home/ben (main)
-r2d2 ->
+~/projects (main)
+mybox ->
 ```
 
 The git segment shows `branch`, a `*` when dirty, and `↑`/`↓` when ahead/behind
