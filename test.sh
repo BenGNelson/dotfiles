@@ -1,36 +1,58 @@
 #!/usr/bin/env bash
 #
-# Fresh-machine smoke test: spin up a clean ubuntu:24.04 container, install the
-# dotfiles into it exactly like a new machine would, and assert that the result
-# is correct, idempotent, and reversible. Requires Docker; nothing is installed
+# Fresh-machine smoke test across a matrix of Linux distros. For each image it
+# spins up a clean container, installs the dotfiles exactly like a new machine
+# would, and asserts the result is correct, idempotent (install runs twice), and
+# reversible (--uninstall). The dependency install inside each container goes
+# through lib/install-tools.sh, so this also exercises the cross-distro
+# (apt/dnf/pacman/zypper) tool installer. Requires Docker; nothing is installed
 # on the host.
 #
-#   ./test.sh
+#   ./test.sh                       # run the full distro matrix
+#   ./test.sh ubuntu:24.04          # run a single image
+#   ./test.sh debian:12 fedora:latest   # run a chosen subset
 
-set -euo pipefail
+set -uo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-IMAGE="${TEST_IMAGE:-ubuntu:24.04}"
+
+# Default matrix: the four mainstream package-manager families.
+DEFAULT_IMAGES=(
+    ubuntu:24.04        # apt
+    ubuntu:22.04        # apt
+    debian:12           # apt
+    fedora:latest       # dnf
+    archlinux:latest    # pacman
+    opensuse/leap:15.6  # zypper
+)
+
+if [ "$#" -gt 0 ]; then
+    IMAGES=("$@")
+else
+    IMAGES=("${DEFAULT_IMAGES[@]}")
+fi
 
 if ! command -v docker > /dev/null 2>&1; then
     echo "docker is required to run this test." >&2
     exit 1
 fi
 
-echo "Running dotfiles smoke test in $IMAGE ..."
-
-# The repo is mounted read-only; everything below runs inside the container.
-docker run --rm -i \
-    -v "$REPO":/repo:ro \
-    -e DEBIAN_FRONTEND=noninteractive \
-    "$IMAGE" bash <<'CONTAINER'
+# The assertions that run inside each container. Kept in a variable so it can be
+# piped to several images. Single-quoted heredoc: nothing expands on the host.
+read -r -d '' CONTAINER_SCRIPT <<'CONTAINER' || true
 set -euo pipefail
 
 fail() { echo "  ✗ $1"; exit 1; }
 pass() { echo "  ✓ $1"; }
 
-# git for the [include] wiring; zsh to verify the zsh config loads too.
-apt-get update -qq && apt-get install -y -qq git zsh > /dev/null
+# Copy the read-only repo to a writable location, like a real clone would land.
+cp -r /repo ~/dotfiles
+
+# Install the test's own dependencies (git for the [include] wiring, zsh to
+# verify the zsh config) THROUGH the shared cross-distro helper — so this step
+# is itself a test of lib/install-tools.sh on this distro.
+. ~/dotfiles/lib/install-tools.sh
+dotfiles_install_tools git zsh > /dev/null
 
 # Make the home dir look like a stock Ubuntu account: a ~/.profile that adds
 # ~/.local/bin to PATH and sources ~/.bashrc. This is the exact arrangement the
@@ -42,9 +64,6 @@ if [ -n "$BASH_VERSION" ] && [ -f "$HOME/.bashrc" ]; then
     . "$HOME/.bashrc"
 fi
 EOF
-
-# Copy the read-only repo to a writable location, like a real clone would land.
-cp -r /repo ~/dotfiles
 
 echo "== install (first run) =="
 ~/dotfiles/install.sh
@@ -108,8 +127,42 @@ git config --global --get-all include.path 2>/dev/null | grep -qxF "$HOME/dotfil
     && fail "git include still present after uninstall"
 pass "uninstall removed all managed blocks and the git include"
 
-echo ""
 echo "ALL CHECKS PASSED"
 CONTAINER
 
-echo "Smoke test complete."
+# ── Run the matrix ───────────────────────────────────────────────────────────
+declare -a RESULTS
+overall=0
+
+for image in "${IMAGES[@]}"; do
+    echo ""
+    echo "════════════════════════════════════════════════════════════════"
+    echo "  $image"
+    echo "════════════════════════════════════════════════════════════════"
+    if printf '%s' "$CONTAINER_SCRIPT" | docker run --rm -i \
+        -v "$REPO":/repo:ro \
+        -e DEBIAN_FRONTEND=noninteractive \
+        "$image" bash; then
+        RESULTS+=("PASS  $image")
+    else
+        RESULTS+=("FAIL  $image")
+        overall=1
+    fi
+done
+
+echo ""
+echo "════════════════════════════════════════════════════════════════"
+echo "  Summary"
+echo "════════════════════════════════════════════════════════════════"
+for r in "${RESULTS[@]}"; do
+    echo "  $r"
+done
+
+if [ "$overall" -eq 0 ]; then
+    echo ""
+    echo "All ${#IMAGES[@]} image(s) passed."
+else
+    echo ""
+    echo "Some images failed." >&2
+fi
+exit "$overall"

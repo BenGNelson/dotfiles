@@ -1,0 +1,25 @@
+name: test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: ${{ matrix.image }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        image:
+          - ubuntu:24.04      # apt
+          - ubuntu:22.04      # apt
+          - debian:12         # apt
+          - fedora:latest     # dnf
+          - archlinux:latest  # pacman
+          - opensuse/leap:15.6  # zypper
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fresh-machine smoke test
+        run: ./test.sh "${{ matrix.image }}"

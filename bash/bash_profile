@@ -5,7 +5,7 @@
 #
 # So: source ~/.profile (which on Debian/Ubuntu also sources ~/.bashrc), then
 # fall back to ~/.bashrc directly if .profile didn't load our config. The
-# _DOTFILES_LOADED sentinel (set at the end of bash/bashrc) prevents a double
-# source on distros where .profile already pulls in .bashrc.
+# _DOTFILES_GUARD sentinel (set by bash/bashrc) means the body still runs at
+# most once, however many of these paths reach it.
 [ -f ~/.profile ] && . ~/.profile
-[ -z "${_DOTFILES_LOADED:-}" ] && [ -f ~/.bashrc ] && . ~/.bashrc
+[ -z "${_DOTFILES_GUARD:-}" ] && [ -f ~/.bashrc ] && . ~/.bashrc

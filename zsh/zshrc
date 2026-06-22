@@ -1,3 +1,7 @@
+# Load this config at most once per shell (mirrors the guard in bash/bashrc).
+[ -n "${_DOTFILES_GUARD:-}" ] && return
+_DOTFILES_GUARD=1
+
 # Repo root, derived from this file's own location so sourcing works no matter
 # where the repo is cloned (not just ~/dotfiles). ${(%):-%x} is the path of the
 # file currently being sourced; :A:h:h makes it absolute and takes the

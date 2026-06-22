@@ -1,7 +1,11 @@
 # dotfiles
 
+[![test](https://github.com/BenGNelson/dotfiles/actions/workflows/test.yml/badge.svg)](https://github.com/BenGNelson/dotfiles/actions/workflows/test.yml)
+
 My personal dotfiles — shell prompt, aliases, vim, and tmux config — kept in sync
-across machines with a single installer.
+across machines with a single installer. CI installs them from scratch on Ubuntu,
+Debian, Fedora, Arch, and openSUSE on every push, so "works on a fresh machine"
+is verified, not hoped for.
 
 ## What's inside
 
@@ -12,8 +16,9 @@ shell/   aliases.sh                           (aliases shared by bash + zsh)
 vim/     vimrc                                (sensible defaults, no plugins)
 tmux/    tmux.conf                            (C-a prefix, mouse, status bar)
 git/     gitconfig                            (aliases + sane defaults; identity stays local)
+lib/     install-tools.sh                     (package-manager-agnostic tool install)
 macos/   hammerspoon/, *.terminal             (reference assets, not auto-installed)
-install.sh    bootstrap.sh    test.sh
+install.sh    bootstrap.sh    test.sh         (+ .github/workflows/test.yml)
 ```
 
 ## Install
@@ -34,7 +39,8 @@ bash <(curl -fsSL https://raw.githubusercontent.com/BenGNelson/dotfiles/main/boo
 ```
 
 On a bare machine that doesn't even have the tools yet, add `--with-tools` to
-`apt-get install` git/vim/tmux first (Debian/Ubuntu only, uses sudo):
+install git/vim/tmux first. It detects the package manager (apt/dnf/pacman/zypper),
+so it works on Debian/Ubuntu, Fedora, Arch, and openSUSE alike (may use sudo):
 
 ```sh
 bash <(curl -fsSL https://raw.githubusercontent.com/BenGNelson/dotfiles/main/bootstrap.sh) --with-tools
@@ -120,14 +126,21 @@ dot-update
 
 ## Testing
 
-`test.sh` spins up a clean `ubuntu:24.04` container, installs the dotfiles into
-it like a brand-new machine, and asserts the result is correct, idempotent
-(install runs twice), and reversible (`--uninstall`). Requires Docker; nothing
-touches the host:
+`test.sh` spins up clean containers across a matrix of distros — Ubuntu 24.04 &
+22.04, Debian 12, Fedora, Arch, and openSUSE (the four major package-manager
+families: apt, dnf, pacman, zypper) — installs the dotfiles into each like a
+brand-new machine, and asserts the result is correct, idempotent (install runs
+twice), and reversible (`--uninstall`). The in-container dependency install goes
+through `lib/install-tools.sh`, so each run also exercises the cross-distro tool
+installer. Requires Docker; nothing touches the host:
 
 ```sh
-./test.sh
+./test.sh                     # full matrix
+./test.sh ubuntu:24.04        # a single image
+./test.sh debian:12 fedora:latest   # a chosen subset
 ```
+
+The same matrix runs in CI (`.github/workflows/test.yml`) on every push.
 
 ## tmux
 

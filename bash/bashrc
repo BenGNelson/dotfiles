@@ -1,3 +1,9 @@
+# Load this config at most once per shell. Some distros (Fedora, openSUSE) ship
+# a ~/.bash_profile that sources ~/.bashrc, and our own ~/.bash_profile reaches
+# ~/.bashrc again via ~/.profile — without this guard the body would run twice.
+[ -n "${_DOTFILES_GUARD:-}" ] && return
+_DOTFILES_GUARD=1
+
 # Repo root, derived from this file's own location so sourcing works no matter
 # where the repo is cloned (not just ~/dotfiles).
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -25,6 +31,6 @@ source "$DOTFILES_DIR/bash/prompt.bash"
 # Aliases
 source "$DOTFILES_DIR/shell/aliases.sh"
 
-# Marker so bash/bash_profile knows our config has loaded (avoids double-source).
-# A counter rather than a flag so the smoke test can prove we load exactly once.
+# Count body executions. The guard above keeps this at 1 no matter how many
+# times ~/.bashrc gets sourced during startup — the smoke test asserts it.
 _DOTFILES_LOADED=$(( ${_DOTFILES_LOADED:-0} + 1 ))
