@@ -20,6 +20,6 @@ jobs:
           - archlinux:latest  # pacman
           - opensuse/leap:15.6  # zypper
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Fresh-machine smoke test
         run: ./test.sh "${{ matrix.image }}"
