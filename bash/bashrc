@@ -1,3 +1,15 @@
+# Repo root, derived from this file's own location so sourcing works no matter
+# where the repo is cloned (not just ~/dotfiles).
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# Ensure ~/.local/bin is on PATH (idempotent — won't duplicate if already there).
+# Most distros' ~/.profile does this for login shells; doing it here covers
+# interactive non-login shells and minimal environments (containers, etc.).
+case ":$PATH:" in
+    *":$HOME/.local/bin:"*) ;;
+    *) export PATH="$HOME/.local/bin:$PATH" ;;
+esac
+
 # LS_COLORS — rich file type coloring for ls
 if command -v dircolors > /dev/null 2>&1; then
     eval "$(dircolors -b)"
@@ -8,7 +20,11 @@ fi
 [ -f ~/.config/dotfiles/local.sh ] && source ~/.config/dotfiles/local.sh
 
 # Prompt
-source ~/dotfiles/bash/prompt.bash
+source "$DOTFILES_DIR/bash/prompt.bash"
 
 # Aliases
-source ~/dotfiles/shell/aliases.sh
+source "$DOTFILES_DIR/shell/aliases.sh"
+
+# Marker so bash/bash_profile knows our config has loaded (avoids double-source).
+# A counter rather than a flag so the smoke test can prove we load exactly once.
+_DOTFILES_LOADED=$(( ${_DOTFILES_LOADED:-0} + 1 ))

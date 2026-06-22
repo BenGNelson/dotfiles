@@ -1,9 +1,19 @@
+# Repo root, derived from this file's own location so sourcing works no matter
+# where the repo is cloned (not just ~/dotfiles). ${(%):-%x} is the path of the
+# file currently being sourced; :A:h:h makes it absolute and takes the
+# grandparent (zsh/zshrc -> repo root).
+DOTFILES_DIR="${${(%):-%x}:A:h:h}"
+
+# Ensure ~/.local/bin is on PATH (idempotent — zsh's typeset -U keeps path unique).
+typeset -U path
+path=("$HOME/.local/bin" $path)
+
 # Per-machine overrides (DOTFILES_LABEL, extra exports, etc.) — sourced FIRST so
 # the prompt can pick up DOTFILES_LABEL. This file is untracked; see install.sh.
 [ -f ~/.config/dotfiles/local.sh ] && source ~/.config/dotfiles/local.sh
 
 # Prompt
-source ~/dotfiles/zsh/prompt.zsh
+source "$DOTFILES_DIR/zsh/prompt.zsh"
 
 # Aliases
-source ~/dotfiles/shell/aliases.sh
+source "$DOTFILES_DIR/shell/aliases.sh"

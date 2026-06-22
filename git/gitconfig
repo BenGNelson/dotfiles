@@ -1,0 +1,40 @@
+# Tracked git config, wired into ~/.gitconfig via an [include] by install.sh.
+# Identity (user.name / user.email) is intentionally NOT here — it lives in the
+# untracked ~/.config/dotfiles/gitconfig.local (included at the bottom), so it
+# never gets committed and can differ per machine.
+
+[init]
+	defaultBranch = main
+
+[pull]
+	ff = only
+
+[push]
+	default = simple
+	autoSetupRemote = true
+
+[fetch]
+	prune = true
+
+[color]
+	ui = auto
+
+[core]
+	editor = vim
+
+[diff]
+	colorMoved = default
+
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	ci = commit
+	df = diff
+	lg = log --oneline --graph --decorate
+	last = log -1 HEAD
+	unstage = reset HEAD --
+
+# Untracked, per-machine identity and overrides. Seeded by install.sh.
+[include]
+	path = ~/.config/dotfiles/gitconfig.local

@@ -1,2 +1,11 @@
-# Login shells: load the interactive bash config.
-[ -f ~/dotfiles/bash/bashrc ] && source ~/dotfiles/bash/bashrc
+# Login shells (SSH, console, `bash -l`) read the first of ~/.bash_profile,
+# ~/.bash_login, ~/.profile that exists — and then stop. Since the installer
+# creates ~/.bash_profile, we must pull in the rest ourselves, or a login shell
+# would lose the distro's ~/.profile setup (PATH for ~/.local/bin, etc.).
+#
+# So: source ~/.profile (which on Debian/Ubuntu also sources ~/.bashrc), then
+# fall back to ~/.bashrc directly if .profile didn't load our config. The
+# _DOTFILES_LOADED sentinel (set at the end of bash/bashrc) prevents a double
+# source on distros where .profile already pulls in .bashrc.
+[ -f ~/.profile ] && . ~/.profile
+[ -z "${_DOTFILES_LOADED:-}" ] && [ -f ~/.bashrc ] && . ~/.bashrc

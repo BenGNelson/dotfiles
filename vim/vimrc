@@ -8,6 +8,9 @@ filetype plugin indent on
 " Turn on syntax highlighting.
 syntax on
 
+" Use UTF-8 — matches the Unicode glyphs in the shell prompt/status bars.
+set encoding=utf-8
+
 " Disable the default Vim startup message.
 set shortmess+=I
 
