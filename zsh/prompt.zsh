@@ -35,4 +35,4 @@ _dot_git_segment() {
 _dot_label="${DOTFILES_LABEL:-${HOST%%.*}}"
 
 # Top line: cyan working dir + git status.  Bottom line: green label + arrow.
-PROMPT='%F{cyan}%~%f$(_dot_git_segment)'$'\n'"%F{green}${_dot_label}%f -> "
+PROMPT='%F{cyan}%d%f$(_dot_git_segment)'$'\n'"%F{green}${_dot_label}%f -> "
